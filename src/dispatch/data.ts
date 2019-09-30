@@ -49,6 +49,7 @@ import {
   updateAllSummaryValues
 } from './summary';
 import { initFilter } from './filter';
+import { isRowHeader } from '../helper/column';
 
 interface OriginData {
   rows: Row[];
@@ -315,8 +316,11 @@ export function appendRow(store: Store, row: OptRow, options: OptAppendRow) {
   const { at = rawData.length } = options;
   const prevRow = rawData[at - 1];
 
+  const emptyData = column.allColumns
+    .filter(({ name }) => !isRowHeader(name))
+    .reduce((acc, { name }) => ({ ...acc, [name]: '' }), {});
   const index = Math.max(-1, ...(mapProp('rowKey', rawData) as number[])) + 1;
-  const rawRow = createRawRow(row, index, defaultValues);
+  const rawRow = createRawRow({ ...emptyData, ...row }, index, defaultValues);
   const viewRow = createViewRow(rawRow, allColumnMap, rawData);
 
   rawData.splice(at, 0, rawRow);
