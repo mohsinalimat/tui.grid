@@ -33,13 +33,13 @@ import {
   isEmpty,
   isString,
   isNumber,
-  isFunction,
-  findPropIndex
+  isFunction
 } from '../helper/common';
 import { listItemText } from '../formatter/listItemText';
 import { createTreeRawData, createTreeCellInfo } from '../helper/tree';
 import { createRowSpan } from '../helper/rowSpan';
 import { cls } from '../helper/dom';
+import { findIndexByRowKey } from '../query/data';
 
 interface OptData {
   data: OptRow[];
@@ -47,6 +47,7 @@ interface OptData {
   pageOptions: PageOptions;
   useClientSort: boolean;
   disabled: boolean;
+  id: number;
 }
 
 interface RawRowOptions {
@@ -440,7 +441,8 @@ export function create({
   column,
   pageOptions: userPageOptions,
   useClientSort,
-  disabled
+  disabled,
+  id
 }: OptData): Observable<Data> {
   const { rawData, viewData } = createData(data, column, true);
 
@@ -482,7 +484,7 @@ export function create({
     },
 
     get filteredIndex(this: Data) {
-      return this.filteredRawData.map(row => findPropIndex('rowKey', row.rowKey, this.rawData)!);
+      return this.filteredRawData.map(row => findIndexByRowKey(this, column, id, row.rowKey));
     },
 
     get filteredViewData(this: Data) {
